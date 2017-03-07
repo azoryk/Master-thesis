@@ -1,0 +1,3 @@
+Because flickr doesn't create a "large" size until the original image is something like 1300 pixels wide, it would be
+unwise to only check for the large size if you're looking for 1024 images.
+
