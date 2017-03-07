@@ -37,7 +37,7 @@ else:
 ###########################################################################
 # flickr auth information:
 # change these to your flickr api keys and secret
-flickrAPIKey = "285a24d486541ae9086afcfefd109f07"  # API key
+flickrAPIKey = "285a24d486541ae9086afcfefd109f07"  # API key "master thesis", user azoryk 
 flickrSecret = "24d0976e877a2a82"                  # shared "secret"
 
 query_file = open(query_file_name, 'r')
