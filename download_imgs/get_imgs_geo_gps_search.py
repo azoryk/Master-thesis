@@ -29,7 +29,7 @@ if len(sys.argv) > 1:
     query_file_name = sys.argv[1] #0 is the command name.
 else:
     print "No command line arguments, reading queries from " + 'queries.txt'
-    query_file_name = 'place_rec_queries.txt'
+    query_file_name = 'bamberg_poi.txt'
     #query_file_name = 'place_rec_queries_fall08.txt'
 
 ###########################################################################
@@ -37,8 +37,8 @@ else:
 ###########################################################################
 # flickr auth information:
 # change these to your flickr api keys and secret
-flickrAPIKey = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # API key
-flickrSecret = "YYYYYYYYYYYYYYYY"                  # shared "secret"
+flickrAPIKey = "285a24d486541ae9086afcfefd109f07"  # API key
+flickrSecret = "24d0976e877a2a82"                  # shared "secret"
 
 query_file = open(query_file_name, 'r')
 
