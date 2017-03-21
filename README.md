@@ -19,5 +19,6 @@ https://culurciello.github.io/tech/2016/06/04/nets.html
 
 Deep Learning Books:
 
-http://neuralnetworksanddeeplearning.com/
+http://neuralnetworksanddeeplearning.com/ 
+
 http://www.deeplearningbook.org/
