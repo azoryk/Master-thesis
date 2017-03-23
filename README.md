@@ -22,3 +22,7 @@ Deep Learning Books:
 http://neuralnetworksanddeeplearning.com/ 
 
 http://www.deeplearningbook.org/
+
+
+James Hays (IM2gps) personal site
+http://www.cc.gatech.edu/~hays/
