@@ -23,10 +23,13 @@ http://neuralnetworksanddeeplearning.com/
 
 http://www.deeplearningbook.org/
 
+Deep Learning Tutorial
+http://ufldl.stanford.edu/tutorial/
+
+
 
 James Hays (IM2gps) personal site
 http://www.cc.gatech.edu/~hays/
-
 
 
 
