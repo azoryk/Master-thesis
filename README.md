@@ -26,3 +26,10 @@ http://www.deeplearningbook.org/
 
 James Hays (IM2gps) personal site
 http://www.cc.gatech.edu/~hays/
+
+
+
+
+--------------------------------------------------
+jobs
+https://www.linkedin.com/in/smola/
