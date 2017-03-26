@@ -18,6 +18,7 @@ https://culurciello.github.io/tech/2016/06/04/nets.html
 
 Deep Learning course
 https://github.com/azoryk/lectures-labs
+
 https://m2dsupsdlclass.github.io/lectures-labs/slides/03_conv_nets
 
 -------------------------------------------------
