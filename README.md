@@ -15,7 +15,9 @@ http://graphics.cs.cmu.edu/projects/im2gps/flickr_code.html
 Neural Network Architectures
 https://culurciello.github.io/tech/2016/06/04/nets.html
 
-
+Deep Learning course
+https://github.com/azoryk/lectures-labs
+https://m2dsupsdlclass.github.io/lectures-labs/slides/03_conv_nets
 
 Deep Learning Books:
 
