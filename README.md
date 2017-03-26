@@ -19,6 +19,8 @@ Deep Learning course
 https://github.com/azoryk/lectures-labs
 https://m2dsupsdlclass.github.io/lectures-labs/slides/03_conv_nets
 
+-------------------------------------------------
+
 Deep Learning Books:
 
 http://neuralnetworksanddeeplearning.com/ 
