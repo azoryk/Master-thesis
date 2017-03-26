@@ -6,6 +6,7 @@ This is my project for my master thesis on the master programm 'Computing in the
 Theme:
 'Recognizing Urban Points of Interests with Convolutional Neural Networks'
 
+-------------------------------------------------
 Important links: 
 
 Code for finding and downloading images on Flickr
