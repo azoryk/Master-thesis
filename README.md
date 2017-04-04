@@ -32,7 +32,9 @@ http://www.deeplearningbook.org/
 Deep Learning Tutorial
 http://ufldl.stanford.edu/tutorial/
 
+VGG Model Tutorial
 
+http://www.robots.ox.ac.uk/~vgg/practicals/cnn/
 
 James Hays (IM2gps) personal site
 http://www.cc.gatech.edu/~hays/
