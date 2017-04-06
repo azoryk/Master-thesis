@@ -32,7 +32,7 @@ path2 = 'C:\\Users\\azoryk\\Desktop\\dataset\\input_data_resized'  # path of fol
 
 listing = os.listdir(path1)
 num_samples = size(listing)
-print (num_samples)
+print(num_samples)
 
 for file in listing:
     im = Image.open(path1 + '\\' + file)
