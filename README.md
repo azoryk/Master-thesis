@@ -40,6 +40,8 @@ James Hays (IM2gps) personal site
 http://www.cc.gatech.edu/~hays/
 
 
+Deep learning for complete beginners: recognising handwritten digits
+https://cambridgespark.com/content/tutorials/deep-learning-for-complete-beginners-recognising-handwritten-digits/index.html
 
 --------------------------------------------------
 jobs
