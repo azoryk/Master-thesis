@@ -23,13 +23,13 @@ socket.setdefaulttimeout(30)  #30 second time out on sockets before they throw
 #the time out needs to be pretty long, it seems, because the flickr servers can be slow
 #to respond to our big searches.
 
-print sys.argv 
+print (sys.argv)
 if len(sys.argv) > 1:
-    print "Reading queries from file " + sys.argv[1]
+    print ("Reading queries from file " + sys.argv[1])
     query_file_name = sys.argv[1] #0 is the command name.
 else:
-    print "No command line arguments, reading queries from " + 'queries.txt'
-    query_file_name = 'bamberg_poi.txt'
+    print ("No command line arguments, reading queries from " + 'queries.txt')
+    query_file_name = 'german_poi.txt'
     #query_file_name = 'place_rec_queries_fall08.txt'
 
 ###########################################################################
@@ -57,10 +57,10 @@ for line in query_file:
         neg_queries = neg_queries + ' ' + line[0:len(line)-2]
         
 query_file.close()
-print 'positive queries:  '
-print pos_queries
-print 'negative queries:  ' + neg_queries
-print 'num_queries = ' + str(num_queries)
+print ('positive queries:  ')
+print (pos_queries)
+print ('negative queries:  ' + neg_queries)
+print ('num_queries = ' + str(num_queries))
 
 # make a new FlickrAPI instance
 fapi = FlickrAPI(flickrAPIKey, flickrSecret)
@@ -73,7 +73,7 @@ for current_tag in range(0, num_queries):
     
     #form the query string.
     query_string = pos_queries[current_tag] + neg_queries
-    print '\n\nquery_string is ' + query_string
+    print ('\n\nquery_string is ' + query_string)
     total_images_queried = 0;
 
 
@@ -96,8 +96,8 @@ for current_tag in range(0, num_queries):
     #this is the desired number of photos in each block
     desired_photos = 250
 
-    print datetime.fromtimestamp(mintime)
-    print datetime.fromtimestamp(endtime)
+    print (datetime.fromtimestamp(mintime))
+    print (datetime.fromtimestamp(endtime))
 
     while (maxtime < endtime):
 

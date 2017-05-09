@@ -64,7 +64,6 @@ sets = flickr.photosets.getList(user_id='94232412@N00')
 This program finds the urls for the mentioned tag, e.g. 'Bamberger dom'
 '''
 
-
 # print (sys.argv)
 # if len(sys.argv) > 1:
 #     print ("Reading queries from file " + sys.argv[1])
@@ -76,21 +75,18 @@ This program finds the urls for the mentioned tag, e.g. 'Bamberger dom'
 #     query_file_name = 'germany_poi.txt'
 
 query_file_name = 'germany_poi.txt'
-query_file = open(query_file_name, 'r')
+query_file = open(query_file_name, 'r', encoding='utf-8-sig')
 queris = []
 
 for line in query_file:
    queris = queris + [line[0:len(line) - 1]]
 
-os.mkdir('image_urls_by_tags')
+#os.mkdir('image_tags_urls')
 
 def get_url_for_tags(keyward):
-
    count_url = 0
-   # os.mkdir('image_tags_urls')
    print("tags to search: " )
    print(keyward)
-
    for tag in keyward:
        print(tag)
        print("Images by tag '" + tag + "' are searching...")
@@ -101,33 +97,38 @@ def get_url_for_tags(keyward):
                         per_page=500,
                         sort="relevance",
                         )
-       file = open(tag + "_photos_url.txt", "w")
-       # shutil.move(file, 'image_tags_urls')
+       file = open(tag + "_photos_url.txt", "w", encoding='utf-8-sig')
 
        urls = []
        for photo in photos:
            try:
                url=photo.get('url_c')
-               urls.append(url)
-               file.write(url + '\n')
-               count_url += 1
+               if url not in urls:
+                   urls.append(url)
+                   file.write(url + '\n')
+                   count_url += 1
 
            except Exception as e:
                continue
-       #shutil.move(file, 'image_urls_by_tags')
+       # file.close()
+       # shutil.move(file, 'image_tags_urls/')
        urls = set(urls)
        print(str(len(urls)) + ' urls were found' )
    return urls
 
 def download_images(urls):
+   os.mkdir('cologne_cathedral')
    for url in urls:
        # file, mime = urllib.request.urlretrieve(url)
-
+       folder_name = 'cologne_cathedral/'
        name = url.split('/')[-1]
-       f = open(name, 'wb')
+       f = open(folder_name + name, 'wb')
        f.write(urllib.request.urlopen(url).read())
        f.close()
-
+       try:
+           shutil.move(name, 'cologne_cathedral/')
+       except:
+           continue
 
        # print(name)
        # shutil.copy(file, './' + name)
@@ -135,5 +136,16 @@ def download_images(urls):
 
 
 
-urls= get_url_for_tags(queris)
+#urls= get_url_for_tags(queris)
+
+
+urls_file_name = 'cologne_cathedral_photos_url'
+urls_file = open(urls_file_name, 'r', encoding='utf-8-sig')
+urls = []
+
+for line in urls_file:
+   urls = urls + [line[0:len(line) - 1]]
+
+
+
 download_images(urls)
