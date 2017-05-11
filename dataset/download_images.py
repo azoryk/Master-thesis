@@ -9,95 +9,46 @@ print(flickrapi.__version__)
 api_key = '285a24d486541ae9086afcfefd109f07' # flickr key
 api_secret = '24d0976e877a2a82' #flickr secret
 
-NUMBER_OF_IMAGES = 1000
-
 flickr = flickrapi.FlickrAPI(api_key, api_secret)
 photos = flickr.photos.search(user_id='94232412@N00', per_page='10')
 sets = flickr.photosets.getList(user_id='94232412@N00')
-
-#
-# def get_urls_for_tags(tags):
-#    # photos = flickr.photos_search(tags=tags, tag_mode='all', per_page=number)
-#
-#     photos = flickr.walk(text=tags, tag_mode='all', tags=tags,
-#                                                   extras='url_c',
-#                                                   per_page=500,
-#                                                   sort="relevance")
-#
-#     urls = []
-#
-#     for photo in photos:
-#         try:
-#             urls.append(photo.getURL(size='Large', urlType='source'))
-#             #urls.append(photo.get('url_c'))
-#         except:
-#             continue
-#     return urls
-#
-#
-# def download_images(urls):
-#
-#     for url in urls:
-#         file, mime = urllib.request.urlretrieve(url)
-#
-#         name = url.split('/')[-1]
-#         print(name)
-#         shutil.copy(file, './' + name)
-#
-#
-# def main(*argv):
-#     args = argv[1:]
-#
-#     if len(args) == 0:
-#         print("You must specify at least one tag")
-#         return 1
-#
-#     tags = [item for item in args]
-#
-#     urls = get_urls_for_tags(tags)
-#     download_images(urls)
-#
-# if __name__ == '__main__':
-#     sys.exit(main(*sys.argv))
 
 '''
 This program finds the urls for the mentioned tag, e.g. 'Bamberger dom'
 '''
 
-# print (sys.argv)
-# if len(sys.argv) > 1:
-#     print ("Reading queries from file " + sys.argv[1])
-#     query_file_name = sys.argv[1] #0 is the command name.
-#     file = open(query_file_name)
-#     print(file.read())
-# else:
-#     print ("No command line arguments, reading queries from " + 'queries.txt')
-#     query_file_name = 'germany_poi.txt'
-
-query_file_name = 'germany_poi.txt'
-query_file = open(query_file_name, 'r', encoding='utf-8-sig')
-queris = []
-
-for line in query_file:
-   queris = queris + [line[0:len(line) - 1]]
-
-#os.mkdir('image_tags_urls')
-
 def get_url_for_tags(keyward):
+   os.mkdir('image_tags_urls')
    count_url = 0
    print("tags to search: " )
    print(keyward)
    for tag in keyward:
        print(tag)
        print("Images by tag '" + tag + "' are searching...")
-       photos = flickr.walk(text=tag,
-                        tag_mode='all',
-                        tags=tag,
-                        extras='url_c',
-                        per_page=500,
-                        sort="relevance",
-                        )
-       file = open(tag + "_photos_url.txt", "w", encoding='utf-8-sig')
+       photos = flickr.walk(api_key=api_key,
+                                        ispublic="1",
+                                        media="photos",
+                                        per_page=250,
+                                        tag_mode = 'all',
+                                        tags = tag,
+                                        text=tag,
+                                        accuracy="11", # Recorded accuracy level of the location information. Current range is 1-16 :
+                                             # World level is 1
+                                             # Country is ~3
+                                             # Region is ~6
+                                            # City is ~11
+                                            # Street is ~16
+                                        extras = 'url_c'
+                                        # text=tag,
+                                        # tag_mode='all',
+                                        # tags=tag,
+                                        # extras='url_c',
+                                        # per_page=500,
+                                        # sort="relevance",
+
+                         )
+       file_path = tag + "_photos_url.txt"
+       file = open(file_path, "w", encoding='utf-8-sig')
 
        urls = []
        for photo in photos:
@@ -110,42 +61,59 @@ def get_url_for_tags(keyward):
 
            except Exception as e:
                continue
-       # file.close()
-       # shutil.move(file, 'image_tags_urls/')
+       file.close()
+
+       shutil.move(file_path, 'image_tags_urls/')
        urls = set(urls)
        print(str(len(urls)) + ' urls were found' )
    return urls
 
-def download_images(urls):
-   os.mkdir('cologne_cathedral')
-   for url in urls:
-       # file, mime = urllib.request.urlretrieve(url)
-       folder_name = 'cologne_cathedral/'
-       name = url.split('/')[-1]
-       f = open(folder_name + name, 'wb')
-       f.write(urllib.request.urlopen(url).read())
-       f.close()
-       try:
-           shutil.move(name, 'cologne_cathedral/')
-       except:
-           continue
 
-       # print(name)
-       # shutil.copy(file, './' + name)
+def download_images(path):  # argument - path to the folder
+    query_file_name = 'germany_poi.txt'
+    query_file = open(query_file_name, 'r', encoding='utf-8-sig')
+
+    queris = []
+
+    for line in query_file:
+        queris = queris + [line[0:len(line) - 1]]
+        url_list = []
+        for file in queris:
+            url_file = open(path +file + '_photos_url.txt', 'r', encoding='utf-8-sig')
+            for url1 in url_file:
+                url_list = url_list + [url1[0:len(url1) - 1]]
+            folder_path =  file + '_images'
+            os.mkdir(folder_path)
+            for url in url_list:
+                name = url.split('/')[-1]
+                f = open(folder_path + '/' + name, 'wb')
+                f.write(urllib.request.urlopen(url).read())
+                f.close()
+                try:
+                    shutil.move(name, folder_path)
+                except:
+                    continue
+def main(*argv):
+    print (sys.argv)
+    if len(sys.argv) > 1:
+        print ("Reading queries from file " + sys.argv[1])
+        query_file_name = sys.argv[1] #the file 'german_poi.txt' should be added in cmd.
+    else:
+        print ("No command line arguments, reading queries from " + 'germany_poi.txt')
+        query_file_name = 'germany_poi.txt'
 
 
+    query_file = open(query_file_name, 'r', encoding='utf-8-sig')
+    queris = []
 
+    for line in query_file:
+        queris = queris + [line[0:len(line) - 1]]
 
-#urls= get_url_for_tags(queris)
+    get_url_for_tags(queris)
 
+    # path = 'image_tags_urls/'
+    # download_images(path)
 
-urls_file_name = 'cologne_cathedral_photos_url'
-urls_file = open(urls_file_name, 'r', encoding='utf-8-sig')
-urls = []
+if __name__ == '__main__':
+    sys.exit(main(*sys.argv))
 
-for line in urls_file:
-   urls = urls + [line[0:len(line) - 1]]
-
-
-
-download_images(urls)
