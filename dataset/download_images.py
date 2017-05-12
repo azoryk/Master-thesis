@@ -26,25 +26,15 @@ def get_url_for_tags(keyward):
        print(tag)
        print("Images by tag '" + tag + "' are searching...")
        photos = flickr.walk(api_key=api_key,
-                                        ispublic="1",
+                                        privacy_filter="1",
                                         media="photos",
-                                        per_page=250,
+                                        per_page=500,
                                         tag_mode = 'all',
                                         tags = tag,
                                         text=tag,
-                                        accuracy="11", # Recorded accuracy level of the location information. Current range is 1-16 :
-                                             # World level is 1
-                                             # Country is ~3
-                                             # Region is ~6
-                                            # City is ~11
-                                            # Street is ~16
-                                        extras = 'url_c'
-                                        # text=tag,
-                                        # tag_mode='all',
-                                        # tags=tag,
-                                        # extras='url_c',
-                                        # per_page=500,
-                                        # sort="relevance",
+                                        accuracy="16",
+                                        extras = 'url_c',
+                                        sort="relevance"
 
                          )
        file_path = tag + "_photos_url.txt"
@@ -71,28 +61,37 @@ def get_url_for_tags(keyward):
 
 def download_images(path):  # argument - path to the folder
     query_file_name = 'germany_poi.txt'
+
     query_file = open(query_file_name, 'r', encoding='utf-8-sig')
-
     queris = []
-
+    print('reading query file')
     for line in query_file:
         queris = queris + [line[0:len(line) - 1]]
-        url_list = []
-        for file in queris:
-            url_file = open(path +file + '_photos_url.txt', 'r', encoding='utf-8-sig')
-            for url1 in url_file:
-                url_list = url_list + [url1[0:len(url1) - 1]]
-            folder_path =  file + '_images'
-            os.mkdir(folder_path)
-            for url in url_list:
-                name = url.split('/')[-1]
-                f = open(folder_path + '/' + name, 'wb')
-                f.write(urllib.request.urlopen(url).read())
-                f.close()
-                try:
-                    shutil.move(name, folder_path)
-                except:
-                    continue
+    url_list = []
+    print('tags to search: ')
+    print(queris)
+    for file in queris:
+        url_file = open(path +file + '_photos_url.txt', 'r', encoding='utf-8-sig')
+        print('reading "' + file + '_photos_url.txt"...' )
+        for url1 in url_file:
+            url_list = url_list + [url1[0:len(url1) - 1]]
+        folder_path =  file + '_images'
+        print('creating folder "' + file + '_images"')
+        os.mkdir(folder_path)
+        print('downloading "' + file  + '" images...')
+        for url in url_list:
+            name = url.split('/')[-1]
+            f = open(folder_path + '/' + name, 'wb')
+            f.write(urllib.request.urlopen(url).read())
+            print(name + ' was downloaded')
+            f.close()
+            try:
+                shutil.move(name, folder_path)
+
+            except:
+                continue
+
+
 def main(*argv):
     print (sys.argv)
     if len(sys.argv) > 1:
@@ -111,8 +110,8 @@ def main(*argv):
 
     get_url_for_tags(queris)
 
-    # path = 'image_tags_urls/'
-    # download_images(path)
+    path = 'image_tags_urls/'
+    download_images(path)
 
 if __name__ == '__main__':
     sys.exit(main(*sys.argv))
