@@ -4,6 +4,7 @@ cologne cathedral
 kölner dom
 neuschwanstein
 frauenkirche
+marienplatz
 
 heiderlberger schloss
 heidelberg castle
@@ -14,15 +15,16 @@ hochenschwangau
 berlin wall
 berliner mauer
 
-marienplatz
+
 
 nürnberger burg
 nuremberg castle
 
 bastei
 
-charlottenburg
+charlottenburg (castle)
 linderhof (castle)
+europa park
 
 rottenburg
 bamberg
