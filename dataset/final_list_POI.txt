@@ -1,5 +1,5 @@
-brandenburger tor
-brandenburg gate
+brandenburger tor 101889
+brandenburg gate 61 146
 cologne cathedral 
 kölner dom
 neuschwanstein
@@ -32,3 +32,4 @@ bamberg
 chimsee
 bodensee
 zugspitze
+holstentor - 5312
