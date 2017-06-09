@@ -27,8 +27,8 @@ img_channels = 1
 # %%
 #  data
 
-path1 = 'C:\\Users\\azoryk\\Desktop\\dataset\\input_data'  # path of folder of images
-path2 = 'C:\\Users\\azoryk\\Desktop\\dataset\\input_data_resized'  # path of folder to save images
+path1 = 'C:\\Users\\azoryk\\Desktop\\dataset1\\input_data'  # path of folder of images
+path2 = 'C:\\Users\\azoryk\\Desktop\\dataset1\\input_data_resized'  # path of folder to save images
 
 listing = os.listdir(path1)
 num_samples = size(listing)
@@ -43,12 +43,12 @@ for file in listing:
 
 imlist = os.listdir(path2)
 
-im1 = array(Image.open('input_data_resized' + '\\' + imlist[0]))  # open one image to get size
+im1 = array(Image.open(path2 + '\\' + imlist[0]))  # open one image to get size
 m, n = im1.shape[0:2]  # get the size of the images
 imnbr = len(imlist)  # get the number of images
 
 # create matrix to store all flattened images
-immatrix = array([array(Image.open('input_data_resized' + '\\' + im2)).flatten()
+immatrix = array([array(Image.open(path2 + '\\' + im2)).flatten()
                   for im2 in imlist], 'f')
 
 label = np.ones((num_samples,), dtype=int)
@@ -88,8 +88,8 @@ nb_conv = 3
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=4)
 
-X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
-X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
+X_train = X_train.reshape(X_train.shape[0], img_rows, img_cols, 1)
+X_test = X_test.reshape(X_test.shape[0], img_rows, img_cols, 1)
 
 X_train = X_train.astype('float32')
 X_test = X_test.astype('float32')
@@ -115,7 +115,7 @@ model = Sequential()
 
 model.add(Convolution2D(nb_filters, nb_conv, nb_conv,
                         border_mode='valid',
-                        input_shape=(1, img_rows, img_cols)))
+                        input_shape=(img_rows, img_cols, 1)))
 convout1 = Activation('relu')
 model.add(convout1)
 model.add(Convolution2D(nb_filters, nb_conv, nb_conv))
