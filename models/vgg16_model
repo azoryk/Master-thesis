@@ -404,13 +404,3 @@ model.save('model.hdf5')
 loaded_model=load_model('model.hdf5')
 
 
-#%%
-
-from keras.utils import plot_model
-plot_model(model, to_file='model.png')
-
-from IPython.display import SVG
-from keras.utils.vis_utils import model_to_dot
-
-SVG(model_to_dot(model).create(prog='dot', format='svg'))
-
