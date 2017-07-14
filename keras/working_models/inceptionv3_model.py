@@ -503,9 +503,9 @@ y_pred = np.argmax(Y_pred, axis=1)
 print(y_pred)
 #y_pred = model.predict_classes(X_test)
 #print(y_pred)
-target_names = ['class 0(zugspitze)', 'class 1(bastei)', 'class 2(berlin wall)','class 3(brandenburger tor)', 
-                'class 4(cologne cathedral)', 'class 5(europa park)', 'class 6(frauenkirche)', 'class 7(heidelberg castle)',
-                'class 8(neuschwanstein)', 'class 9(reichstag)']
+target_names =  ['class 0(neuschwanstein)', 'class 1(cologne cathedral)', 'class 2(brandenburger tor)','class 3(heidelberg castle)', 
+                'class 4(marienplatz)', 'class 5(frauenkirche dresden)', 'class 6(berlin wall)', 'class 7(reichstag)',
+                'class 8(nymphenburg)', 'class 9(speicherstadt)']
 
 
 
