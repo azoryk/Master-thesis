@@ -17,14 +17,22 @@ due to its reliance on `SeparableConvolution` layers.
 - [Xception: Deep Learning with Depthwise Separable Convolutions](https://arxiv.org/abs/1610.02357)
 
 '''
+
+#%%
 from __future__ import print_function
 from __future__ import absolute_import
 
 import warnings
 import numpy as np
+import os
+from scipy.misc import imread, imresize
+import matplotlib.pyplot as plt
+from keras.utils import np_utils
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
 
 from keras.preprocessing import image
-
+from keras.optimizers import SGD
 from keras.models import Model
 from keras import layers
 from keras.layers import Dense
@@ -39,15 +47,20 @@ from keras.layers import GlobalMaxPooling2D
 from keras.engine.topology import get_source_inputs
 from keras.utils.data_utils import get_file
 from keras import backend as K
+K.set_image_dim_ordering('tf')
+
 from keras.applications.imagenet_utils import decode_predictions
 from keras.applications.imagenet_utils import _obtain_input_shape
 
+from keras.preprocessing.image import ImageDataGenerator
+
+from sklearn.metrics import log_loss
 
 TF_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.4/xception_weights_tf_dim_ordering_tf_kernels.h5'
 TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.4/xception_weights_tf_dim_ordering_tf_kernels_notop.h5'
 
-
-def Xception(include_top=True, weights='imagenet',
+#%%
+def Xception_model(include_top=True, weights='imagenet',
              input_tensor=None, input_shape=None,
              pooling=None,
              classes=1000):
@@ -257,8 +270,12 @@ def Xception(include_top=True, weights='imagenet',
                                     cache_subdir='models')
         model.load_weights(weights_path)
 
+    
     if old_data_format:
         K.set_image_data_format(old_data_format)
+#    sgd = SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
+#    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+    
     return model
 
 
@@ -267,18 +284,255 @@ def preprocess_input(x):
     x -= 0.5
     x *= 2.
     return x
+#%%
+
+#if __name__ == '__main__':
+#    model = Xception(include_top=True, weights='imagenet')
+#
+#    img_path = 'elephant.jpg'
+#    img = image.load_img(img_path, target_size=(299, 299))
+#    x = image.img_to_array(img)
+#    x = np.expand_dims(x, axis=0)
+#    x = preprocess_input(x)
+#    print('Input image shape:', x.shape)
+#
+#    preds = model.predict(x)
+#    print(np.argmax(preds))
+#    print('Predicted:', decode_predictions(preds, 1))
 
 
 if __name__ == '__main__':
-    model = Xception(include_top=True, weights='imagenet')
 
-    img_path = 'elephant.jpg'
-    img = image.load_img(img_path, target_size=(299, 299))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    print('Input image shape:', x.shape)
+    # Example to fine-tune on 3000 samples from Cifar10
 
-    preds = model.predict(x)
-    print(np.argmax(preds))
-    print('Predicted:', decode_predictions(preds, 1))
+    img_rows, img_cols = 299, 299 # Resolution of inputs
+    num_channel = 3
+    num_classes = 10 
+    batch_size = 16 
+    nb_epoch = 20
+    img_mode = 'RGB'
+
+    
+    # path of folder of images
+    data_path = r'C:\Users\Administrator\Desktop\az\poi_dataset_1k\train'  
+    
+    # Define data path
+    
+    data_dir_list = os.listdir(data_path) #MacOS creates automatically '.DS_Store' file in each folder
+    if data_dir_list[0] == '.DS_Store':
+        data_dir_list = os.listdir(data_path)[1:]
+    print (data_dir_list)
+    
+    #list of all the images
+    img_data_list=[]
+
+#total number of images
+    num_samples = 0
+
+
+#image preprocessing
+    for dataset in data_dir_list:
+        img_list=os.listdir(data_path+'\\'+ dataset)
+        if img_list[0] == '.DS_Store':
+            img_list = os.listdir(data_path+'\\'+ dataset)[1:] 
+        num_samples +=len(img_list)
+        print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
+        
+        for img in img_list:
+                input_img= imread(data_path + '\\'+ dataset + '\\'+ img, mode = img_mode)
+                
+                #input_img_grey=input_img.convert('L')
+                input_img_resize = imresize(input_img, (img_rows, img_cols))
+                img_data_list.append(input_img_resize)
+    
+    print(num_samples)
+        
+    print(len(img_data_list))
+    
+    #array of all the images
+    img_data = np.array(img_data_list, dtype = 'float32')
+    print(img_data.shape)
+    img_data = img_data.astype('float32')
+    img_data /= 255
+    print (img_data.shape)
+    
+    if num_channel==1:
+    	if K.image_dim_ordering()=='th':
+    		img_data= np.expand_dims(img_data, axis=1) 
+    		print (img_data.shape)
+    	else:
+    		img_data= np.expand_dims(img_data, axis=4) 
+    		print (img_data.shape)
+    		
+    else:
+    	if K.image_dim_ordering()=='th':
+    		img_data=np.rollaxis(img_data,3,1)
+    		print (img_data.shape)
+    
+        # Define the number of classes
+    num_classes = 10     
+    
+    label = np.ones((num_samples,), dtype=int)
+    count1 = 0
+    count2 = 0
+    for dirs in data_dir_list:
+        img_list=os.listdir(data_path+'\\'+ dirs)[1:]
+        count1, count2 =count2, count2 + len(img_list)
+        label[count1:count2] = dirs[1:2]
+        
+    #list of labels    
+    poi_list = ['neuschwanstein','cologne cathedral','brandenburger tor', 'heidelberg castle' , 
+                'marienplatz', 'frauenkirche dresden', 'berlin wall', 'reichstag', 
+                'nymphenburg', 'speicherstadt']
+    
+    
+    # convert class labels to on-hot encoding
+    Y = np_utils.to_categorical(label, num_classes)
+    
+    #Shuffle the dataset
+    x,y = shuffle(img_data,Y, random_state=2)
+    
+    # Split the dataset
+    X_train, X_test, Y_train, Y_test = train_test_split(x, y, test_size=0.2, random_state=2)    
+    # Load Cifar10 data. Please implement your own load_data() module for your own dataset
+    #X_train, Y_train, X_valid, Y_valid = load_cifar10_data(img_rows, img_cols)
+
+#%%
+        # Load our model
+        
+    nb_epoch = 10
+    #pre-trained CNN Model using imagenet dataset for pre-trained weights
+    base_model = Xception_model( input_shape=( img_rows, img_cols, num_channel), weights='imagenet', include_top=False)
+    
+    #Top model block
+    x = base_model.output
+    x = GlobalAveragePooling2D()(x)
+    predictions = Dense(num_classes, activation = 'softmax')(x)
+        
+    #add the top layer to the base model
+    model = Model(base_model.input, predictions)
+    print(model.summary())
+    
+    
+    #let's train only top layers and freeze all layers that were pre-trained
+    for layer in base_model.layers:
+        layer.trainable = False
+    
+    #read data and augment it
+    datagen = ImageDataGenerator (featurewise_center=True,
+                                  featurewise_std_normalization=True,
+                                  rotation_range=20,
+                                  width_shift_range=0.2,
+                                  height_shift_range=0.2,
+                                  horizontal_flip=True,
+                                  rescale=1. / 255
+#                                  shear_range=0.2,
+#                                  zoom_range=0.2,
+#                                     
+   )
+    sgd = SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+    
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32), 
+                        steps_per_epoch = len(X_train)/32, 
+                        epochs = nb_epoch, 
+                        verbose=1,
+                        validation_data=(X_test, Y_test))
+    
+        # Start Fine-tuning
+#    model.fit(X_train, Y_train,
+#              batch_size=batch_size,
+#              epochs=nb_epoch,
+#              shuffle=True,
+#              verbose=1,
+#              validation_data=(X_test, Y_test),
+#              )
+
+    # Make predictions
+    predictions_valid = model.predict(X_test, batch_size=batch_size, verbose=1)
+
+    # Cross-entropy loss score
+    score = log_loss(Y_test, predictions_valid)
+    print(score)
+    
+#%%
+
+# Evaluating the model
+
+score = model.evaluate(X_test, Y_test, verbose=1)
+print('Test Loss:', score[0])
+print('Test accuracy:', score[1])
+
+#%%
+#Testing random image from test dataset
+test_image = X_test[229:230]
+
+print(model.predict(test_image))
+#print(model.predict_classes(test_image))
+print(Y_test[229:230])
+
+print((model.predict(test_image)))			 
+pred = model.predict(test_image).reshape(10,)			
+print(pred)			
+			
+			
+max_val = np.amax(pred)			
+max_ind = np.argmax(pred)			
+			
+print('Test image belongs to: class 0' + str(max_ind) + ' "' + str(poi_list[max_ind]) + '" with the acccuracy: ' + str(max_val) )			
+
+img = test_image.reshape(img_rows, img_cols, num_channel)
+plt.imshow(img)
+#plt.imshow(img, cmap='gray')
+
+#%%
+# Testing a new image
+test_image = imread(r'C:\Users\Administrator\Desktop\fischbrunnen_marienplatz.jpg', mode = img_mode)
+#test_image=cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
+
+#Testing the image from internet
+from skimage import io
+#insert the url to image here
+url = 'https://www.bayern.by/data/mediadb/cms_pictures/%7B8cc4fa3b-f0df-e849-cd57-67721903be50%7D.jpg'
+test_image = io.imread(url)
+
+test_image = imresize(test_image,(img_rows,img_cols))
+test_image = np.array(test_image)
+test_image = test_image.astype('float32')
+test_image /= 255
+print (test_image.shape)
+   
+if num_channel==1:
+	if K.image_dim_ordering()=='th':
+		test_image= np.expand_dims(test_image, axis=0)
+		test_image= np.expand_dims(test_image, axis=0)
+		print (test_image.shape)
+	else:
+		test_image= np.expand_dims(test_image, axis=3) 
+		test_image= np.expand_dims(test_image, axis=0)
+		print (test_image.shape)
+		
+else:
+	if K.image_dim_ordering()=='th':
+		test_image=np.rollaxis(test_image,2,0)
+		test_image= np.expand_dims(test_image, axis=0)
+		print (test_image.shape)
+	else:
+		test_image= np.expand_dims(test_image, axis=0)
+		print (test_image.shape)
+		
+# Predicting the test image
+#print((model.predict(test_image)))
+#print(model.predict_classes(test_image))
+
+# Predicting the test image			
+			
+print((model.predict(test_image)))			
+pred = model.predict(test_image).reshape(10,)			
+print(pred)			
+			
+			
+max_val = np.amax(pred)			
+max_ind = np.argmax(pred)			
+			
+print('Test image belongs to: class 0' + str(max_ind) + ' "' + str(poi_list[max_ind]) + '" with the acccuracy: ' + str(max_val) )		
