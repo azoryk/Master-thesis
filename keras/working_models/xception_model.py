@@ -31,7 +31,7 @@ from keras.utils import np_utils
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
-from keras.preprocessing import image
+#from keras.preprocessing import image
 from keras.optimizers import SGD
 from keras.models import Model
 from keras import layers
@@ -49,7 +49,7 @@ from keras.utils.data_utils import get_file
 from keras import backend as K
 K.set_image_dim_ordering('tf')
 
-from keras.applications.imagenet_utils import decode_predictions
+#from keras.applications.imagenet_utils import decode_predictions
 from keras.applications.imagenet_utils import _obtain_input_shape
 
 from keras.preprocessing.image import ImageDataGenerator
@@ -279,11 +279,6 @@ def Xception_model(include_top=True, weights='imagenet',
     return model
 
 
-def preprocess_input(x):
-    x /= 255.
-    x -= 0.5
-    x *= 2.
-    return x
 #%%
 
 #if __name__ == '__main__':
@@ -314,7 +309,7 @@ if __name__ == '__main__':
 
     
     # path of folder of images
-    data_path = r'C:\Users\Administrator\Desktop\az\poi_dataset_1k\train'  
+    data_path = r'C:\Users\Administrator\Desktop\az\poi_dataset_1K\train'  
     
     # Define data path
     
@@ -400,7 +395,6 @@ if __name__ == '__main__':
 #%%
         # Load our model
         
-    nb_epoch = 10
     #pre-trained CNN Model using imagenet dataset for pre-trained weights
     base_model = Xception_model( input_shape=( img_rows, img_cols, num_channel), weights='imagenet', include_top=False)
     
@@ -419,34 +413,40 @@ if __name__ == '__main__':
         layer.trainable = False
     
     #read data and augment it
-    datagen = ImageDataGenerator (featurewise_center=True,
-                                  featurewise_std_normalization=True,
-                                  rotation_range=20,
-                                  width_shift_range=0.2,
-                                  height_shift_range=0.2,
-                                  horizontal_flip=True,
-                                  rescale=1. / 255
-#                                  shear_range=0.2,
-#                                  zoom_range=0.2,
-#                                     
-   )
+#    datagen = ImageDataGenerator (featurewise_center=True,
+#                                  featurewise_std_normalization=True,
+#                                  rotation_range=20,
+#                                  width_shift_range=0.2,
+#                                  height_shift_range=0.2,
+#                                  horizontal_flip=True,
+#                                  rescale=1. / 255
+##                                  shear_range=0.2,
+##                                  zoom_range=0.2,
+##                                     
+#   )
+    # Defines the metrics for calculating top3 accuracy
+    from keras.metrics import top_k_categorical_accuracy
+    def top_3_categorical_accuracy(y_true, y_pred):
+        return top_k_categorical_accuracy(y_true, y_pred, k=3) 
+
+    # Compiles the model with stochastic gradient descent
     sgd = SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy', top_3_categorical_accuracy ])
     
-    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32), 
-                        steps_per_epoch = len(X_train)/32, 
-                        epochs = nb_epoch, 
-                        verbose=1,
-                        validation_data=(X_test, Y_test))
+#    hist = model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32), 
+#                        steps_per_epoch = len(X_train)/32, 
+#                        epochs = nb_epoch, 
+#                        verbose=1,
+#                        validation_data=(X_test, Y_test))
     
         # Start Fine-tuning
-#    model.fit(X_train, Y_train,
-#              batch_size=batch_size,
-#              epochs=nb_epoch,
-#              shuffle=True,
-#              verbose=1,
-#              validation_data=(X_test, Y_test),
-#              )
+    hist = model.fit(X_train, Y_train,
+              batch_size=batch_size,
+              epochs=nb_epoch,
+              shuffle=True,
+              verbose=1,
+              validation_data=(X_test, Y_test),
+              )
 
     # Make predictions
     predictions_valid = model.predict(X_test, batch_size=batch_size, verbose=1)
@@ -455,13 +455,22 @@ if __name__ == '__main__':
     score = log_loss(Y_test, predictions_valid)
     print(score)
     
-#%%
+    #%%
 
 # Evaluating the model
 
+# Evaluating the model with test loss, test accuracy and top3 accuracy
 score = model.evaluate(X_test, Y_test, verbose=1)
 print('Test Loss:', score[0])
 print('Test accuracy:', score[1])
+print('Top-3 accuracy:', score[2])
+
+# Computing the error rates 
+error = 1-score[1]
+top3error = 1- score[2]
+
+print('Error: ', error)
+print('Top-3 error: ', top3error)
 
 #%%
 #Testing random image from test dataset
@@ -486,14 +495,14 @@ plt.imshow(img)
 #plt.imshow(img, cmap='gray')
 
 #%%
-# Testing a new image
-test_image = imread(r'C:\Users\Administrator\Desktop\fischbrunnen_marienplatz.jpg', mode = img_mode)
+# Testing a new image from local storage
+#test_image = imread(r'C:\Users\Administrator\Desktop\fischbrunnen_marienplatz.jpg', mode = img_mode)
 #test_image=cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
 
 #Testing the image from internet
 from skimage import io
 #insert the url to image here
-url = 'https://www.bayern.by/data/mediadb/cms_pictures/%7B8cc4fa3b-f0df-e849-cd57-67721903be50%7D.jpg'
+url = 'https://c1.staticflickr.com/3/2074/2236786696_81f1e5b5e3_b.jpg'
 test_image = io.imread(url)
 
 test_image = imresize(test_image,(img_rows,img_cols))
@@ -536,3 +545,41 @@ max_val = np.amax(pred)
 max_ind = np.argmax(pred)			
 			
 print('Test image belongs to: class 0' + str(max_ind) + ' "' + str(poi_list[max_ind]) + '" with the acccuracy: ' + str(max_val) )		
+
+img = test_image.reshape(img_rows, img_cols, num_channel)
+plt.imshow(img)
+
+#%%
+# visualizing losses and accuracy
+train_loss=hist.history['loss']
+val_loss=hist.history['val_loss']
+train_acc=hist.history['acc']
+val_acc=hist.history['val_acc']
+top3_acc=hist.history['top_3_categorical_accuracy']
+val_top3_acc=hist.history['val_top_3_categorical_accuracy']
+xc=range(nb_epoch)
+
+#
+plt.figure(1,figsize=(7,5))
+plt.plot(xc,train_loss)
+plt.plot(xc,val_loss)
+plt.xlabel('Number of Epochs')
+plt.ylabel('Loss')
+plt.title('Train Loss vs Validation Loss')
+plt.grid(True)
+plt.legend(['train','val'])
+#print (plt.style.available) # use bmh, classic,ggplot for big pictures
+plt.style.use(['seaborn-white'])
+plt.show()
+
+plt.figure(2,figsize=(7,5))
+plt.plot(xc,train_acc)
+plt.plot(xc,val_acc)
+plt.plot(xc,val_top3_acc)
+plt.xlabel('Number of Epochs')
+plt.ylabel('Accuracy')
+plt.title('Train Accuracy vs. Validation Accuracy vs Top-3 Accuracy')
+plt.grid(True)
+plt.legend(['train','val', 'top3_acc'],loc=4)
+print (plt.style.available) # use bmh, classic,ggplot for big pictures
+plt.style.use(['seaborn-white'])
