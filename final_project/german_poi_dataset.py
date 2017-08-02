@@ -3,6 +3,11 @@ Image querying and downloading script written by Andriy Zoryk
 hinted from "Code for finding and downloading images on Flickr"
 http://graphics.cs.cmu.edu/projects/im2gps/flickr_code.html  and
 https://stackoverflow.com
+
+please install flickrapi module before starting
+
+the script is ready to start from the master folder
+
 '''
 import flickrapi
 import sys
@@ -53,6 +58,7 @@ def get_url_for_tags(keyward):
                print("Searching images from " + str(datetime.fromtimestamp(mintime)))
                print("Searching is till " + str(datetime.fromtimestamp(maxtime)))
 
+#this method searches the images. Please consider the needed arguments
                photos = flickr.walk(api_key=api_key,
                                       #privacy_filter="1",
                                       #media="photos",
@@ -91,7 +97,7 @@ def download_images(path):  # argument - path to the folder with urls files
 
   if not os.path.isdir('dataset_final'):
       os.mkdir('dataset_final')
-  query_file_name = 'germany_poi.txt'
+  query_file_name = 'german_poi.txt'
   query_file = open(query_file_name, 'r', encoding='utf-8-sig')
   queris = []
   print('Reading query file...')
@@ -119,21 +125,17 @@ def download_images(path):  # argument - path to the folder with urls files
           print(name + ' was downloaded')
           f.close()
           try:
+              #moves the file with urls to the folder
               shutil.move(name, folder_path)
 
           except:
               continue
 
 def main(*argv):
-  print (sys.argv)
-  if len(sys.argv) > 1:
-      print ("Reading queries from file " + sys.argv[1])
-      query_file_name = sys.argv[1] #the file 'german_poi.txt' should be added in cmd.
-  else:
-      print ("No command line arguments, reading queries from " + 'germany_poi.txt')
 
-#the .txt file where the list of all landmarks was saved
-  query_file_name = 'germany_poi.txt'
+#the txt-file where the list of all landmarks was saved
+#provide the new name for your own tags
+  query_file_name = 'german_poi.txt'
   query_file = open(query_file_name, 'r', encoding='utf-8-sig')
   queris = []
 
@@ -141,10 +143,11 @@ def main(*argv):
   for line in query_file:
       queris = queris + [line[0:len(line) - 1]]
 
+#let's save all the images' urls in one txt-file
   get_url_for_tags(queris)
 
 #provide the path to your .txt file with the urls 
-  path = 'christkindl/'
+  path = 'image_tags_urls/'
   download_images(path)
 
 if __name__ == '__main__':
